@@ -25,12 +25,13 @@ def is_low_rated(rating):
 
 
 def detect_issues(product_data):
-    """Aggregate issue checks for a given product."""
-    name = product_data.get("name", "")
-    price = product_data.get("price", 0)
-    mrp = product_data.get("mrp", 0)
-    rating = product_data.get("rating", 5)
-    trusted_domain = product_data.get("trusted_domain", False)
+    return {
+        "misspelling": check_spelling(product_data.get("user_input", product_data["name"])),
+        "fake_discount": is_fake_discount(product_data["price"], product_data["mrp"]),
+        "low_ratings": is_low_rated(product_data.get("rating", 5)),
+        "suspicious_domain": not product_data.get("trusted_domain", False)
+    }
+
 
     return {
         "misspelling": check_spelling(name),

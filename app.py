@@ -12,12 +12,17 @@ def index():
         query1 = request.form.get("product1")
         query2 = request.form.get("product2")
 
+        # Fetch data from Google Shopping API
         product1 = fetch_product_details(query1)
         product2 = fetch_product_details(query2)
 
         if "error" in product1 or "error" in product2:
             error_msg = product1.get("error") or product2.get("error")
             return render_template("index.html", error=error_msg)
+
+        # Inject original user query for spelling check
+        product1["user_input"] = query1
+        product2["user_input"] = query2
 
         issues1 = detect_issues(product1)
         issues2 = detect_issues(product2)
