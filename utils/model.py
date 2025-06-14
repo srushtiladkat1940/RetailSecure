@@ -25,11 +25,20 @@ def classify_name(name):
     try:
         response = requests.post(API_URL, headers=HEADERS, json={"inputs": name})
         response.raise_for_status()
-        result = response.json()[0][0]
+
+        predictions = response.json()
+
+        if not isinstance(predictions, list) or not predictions[0]:
+            raise ValueError("Empty or unexpected API response")
+
+        # Find the label with the highest confidence
+        top_prediction = max(predictions[0], key=lambda x: x["score"])
+
         return {
-            "label": result["label"],
-            "confidence": round(result["score"] * 100, 2)
+            "label": top_prediction["label"].upper(),  # POSITIVE or NEGATIVE
+            "confidence": round(top_prediction["score"] * 100, 2)
         }
+
     except requests.exceptions.RequestException as e:
         print(f"[ERROR] API request failed: {e}")
         return {
@@ -37,8 +46,9 @@ def classify_name(name):
             "confidence": 0,
             "error": str(e)
         }
-    except (KeyError, IndexError) as e:
-        print(f"[ERROR] Unexpected response format: {response.text}")
+
+    except (KeyError, IndexError, ValueError) as e:
+        print(f"[ERROR] Unexpected response: {response.text}")
         return {
             "label": "ERROR",
             "confidence": 0,

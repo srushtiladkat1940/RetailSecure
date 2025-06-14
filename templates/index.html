@@ -1,34 +1,82 @@
-<h1>RetailSecure 🛡️</h1>
-<form method="POST">
-  <input type="text" name="product1" placeholder="Enter first product name..." required>
-  <input type="text" name="product2" placeholder="Enter second product name..." required>
-  <button type="submit">Compare Products</button>
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RetailSecure - Fake Deal Detector</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .result {
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      background-color: #f9f9f9;
+    }
+    .genuine {
+      border-color: green;
+      background-color: #e8fce8;
+    }
+    .fake {
+      border-color: red;
+      background-color: #ffecec;
+    }
+  </style>
+</head>
+<body>
+  <h1>RetailSecure 🛡️</h1>
+  <form method="POST">
+    <input type="text" name="product1" placeholder="Enter first product name..." required>
+    <input type="text" name="product2" placeholder="Enter second product name..." required>
+    <button type="submit">Compare Products</button>
+  </form>
 
-{% if product1 and product2 %}
-  <div style="display: flex; gap: 30px; justify-content: center;">
-    {% for product, issues, ai_result, label in [(product1, issues1, ai_result1, 'Product 1'), (product2, issues2, ai_result2, 'Product 2')] %}
-      <div class="result" style="flex: 1;">
-        <h2>{{ label }}: {{ product.name }}</h2>
-        {% if product.image %}
-          <img src="{{ product.image }}" alt="Product Image" style="max-height: 200px;"><br>
-        {% endif %}
-        {% if product.link %}
-          <p><a href="{{ product.link }}" target="_blank">🔗 View on Store</a></p>
-        {% endif %}
-        <p>Price: ₹{{ product.price }} / MRP: ₹{{ product.mrp }}</p>
-        <p>Rating: {{ product.rating }}⭐</p>
+  {% if product1 and product2 %}
+    <div style="display: flex; gap: 30px; justify-content: center; margin-top: 30px;">
+      {% for product, issues, ai_result, label in [(product1, issues1, ai_result1, 'Product 1'), (product2, issues2, ai_result2, 'Product 2')] %}
 
-        <h3>🛑 Warnings:</h3>
-        <ul>
-          {% for key, value in issues.items() %}
-            <li>{{ key.replace('_', ' ').title() }}: {{ '❌' if value else '✅' }}</li>
-          {% endfor %}
-        </ul>
+        {% set is_fake = (ai_result.label == 'NEGATIVE' or issues.fake_discount or issues.suspicious_domain) %}
+        <div class="result {{ 'fake' if is_fake else 'genuine' }}" style="flex: 1;">
+          <h2>{{ label }}: {{ product.name }}</h2>
 
-        <h3>🤖 AI Classification:</h3>
-        <p>{{ ai_result.label }} (Confidence: {{ ai_result.confidence }}%)</p>
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
+          {% if product.image %}
+            <img src="{{ product.image }}" alt="Product Image" style="max-height: 200px;"><br>
+          {% endif %}
+
+          {% if product.link %}
+            <p><a href="{{ product.link }}" target="_blank">🔗 View on Store</a></p>
+          {% endif %}
+
+          <p>Price: ₹{{ product.price }} / MRP: ₹{{ product.mrp }}</p>
+          <p>Rating: {{ product.rating }}⭐</p>
+
+          <h3>🛑 Warnings:</h3>
+          <ul>
+            {% for key, value in issues.items() %}
+              <li>{{ key.replace('_', ' ').title() }}: {{ '❌' if value else '✅' }}</li>
+            {% endfor %}
+          </ul>
+
+          <h3>🤖 AI Classification:</h3>
+          <p>
+            {{ ai_result.label }} 
+            (Confidence: {{ ai_result.confidence }}%) 
+            <br>
+            {% if ai_result.label == 'POSITIVE' %}
+              <span style="color: green;">✅ Likely Genuine Product</span>
+            {% elif ai_result.label == 'NEGATIVE' %}
+              <span style="color: red;">🚩 Possibly Fake Product</span>
+            {% else %}
+              <span style="color: gray;">⚠️ Uncertain</span>
+            {% endif %}
+          </p>
+
+          {% if is_fake %}
+            <h3 style="color: red;">🚨 Verdict: Suspected Fake</h3>
+          {% else %}
+            <h3 style="color: green;">✅ Verdict: Looks Genuine</h3>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</body>
+</html>
