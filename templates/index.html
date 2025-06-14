@@ -14,6 +14,12 @@
   {% if product %}
     <div class="result">
       <h2>Product: {{ product.name }}</h2>
+      {% if product.image %}
+        <img src="{{ product.image }}" alt="Product Image" style="max-height: 200px;"><br>
+      {% endif %}
+      {% if product.link %}
+        <p><a href="{{ product.link }}" target="_blank">🔗 View on Store</a></p>
+      {% endif %}
       <p>Price: ₹{{ product.price }} / MRP: ₹{{ product.mrp }}</p>
       <p>Rating: {{ product.rating }}⭐</p>
 

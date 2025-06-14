@@ -2,13 +2,11 @@ import requests
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env (used locally; ignored on Railway)
 load_dotenv()
 
 API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
 HF_TOKEN = os.getenv("HF_API_TOKEN")
 
-# Ensure the token is available
 if not HF_TOKEN:
     raise ValueError("Hugging Face API token not set. Please add HF_API_TOKEN in your .env or Railway environment variables.")
 
@@ -17,9 +15,16 @@ HEADERS = {
 }
 
 def classify_name(name):
+    if not name or name.strip().lower() in ["unknown product", "error fetching product"]:
+        return {
+            "label": "ERROR",
+            "confidence": 0,
+            "error": "Invalid or empty product name"
+        }
+
     try:
         response = requests.post(API_URL, headers=HEADERS, json={"inputs": name})
-        response.raise_for_status()  # Raise error for HTTP status 4xx/5xx
+        response.raise_for_status()
         result = response.json()[0][0]
         return {
             "label": result["label"],

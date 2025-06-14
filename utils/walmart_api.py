@@ -1,6 +1,14 @@
 import requests
+import re
 
 SERP_API_KEY = "f6e96ff0531de455248fd3a76534ce7e96f26f5ffbadb5f4bc2d88381788f3ce"  # Replace with your actual key
+
+def parse_price(price_str):
+    try:
+        clean = re.sub(r'[^\d.]', '', price_str)
+        return float(clean) if clean else 0.0
+    except:
+        return 0.0
 
 def fetch_product_details(product_query):
     url = "https://serpapi.com/search.json"
@@ -19,21 +27,19 @@ def fetch_product_details(product_query):
         if not results:
             return {"error": "No results found for this product."}
 
-        # Use the first product found
         product = results[0]
-        price_str = product.get("price", "₹0").replace("₹", "").replace(",", "")
-        price = float(price_str) if price_str.replace('.', '', 1).isdigit() else 0.0
+        price = parse_price(product.get("price", "₹0"))
 
         return {
             "name": product.get("title", "Unknown Product"),
             "price": price,
-            "mrp": round(price * 1.8, 2),  # inflated MRP for testing
+            "mrp": round(price * 1.8, 2) if price else 0.0,
             "rating": product.get("rating", 0),
             "product_id": product.get("product_id", "N/A"),
             "domain": "google.com",
             "trusted_domain": True,
             "image": product.get("thumbnail", ""),
-            "link": product.get("link", "")
+            "link": product.get("link", "#")
         }
 
     except Exception as e:
