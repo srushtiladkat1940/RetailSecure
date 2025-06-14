@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RetailSecure - Fake Deal Detector</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>RetailSecure 🛡️</h1>
+  <form method="POST">
+    <input type="text" name="product_url" placeholder="Paste product link here" required>
+    <button type="submit">Scan Product</button>
+  </form>
+
+  {% if product %}
+    <div class="result">
+      <h2>Product: {{ product.name }}</h2>
+      <p>Price: ₹{{ product.price }} / MRP: ₹{{ product.mrp }}</p>
+      <p>Rating: {{ product.rating }}⭐</p>
+
+      <h3>🛑 Warnings:</h3>
+      <ul>
+        {% for key, value in issues.items() %}
+          <li>{{ key.replace('_', ' ').title() }}: {{ '❌' if value else '✅' }}</li>
+        {% endfor %}
+      </ul>
+
+      <h3>🤖 AI Classification:</h3>
+      <p>{{ ai_result.label }} (Confidence: {{ ai_result.confidence }}%)</p>
+    </div>
+  {% endif %}
+</body>
+</html>
