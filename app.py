@@ -17,5 +17,5 @@ def index():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Use the port Render provides
-    app.run(debug=False, host="0.0.0.0", port=port)  # Bind to all IPs so Render can reach it
+    port = int(os.environ.get("PORT", 10000))  # Render uses PORT env var
+    app.run(host="0.0.0.0", port=port)
