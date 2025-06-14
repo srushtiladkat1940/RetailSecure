@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request
-from utils.walmart_api import fetch_product_details
+from utils.product_api import fetch_product_details
 from utils.detector import detect_issues
 from utils.model import classify_name
 
