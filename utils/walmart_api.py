@@ -5,7 +5,8 @@ TRUSTED_DOMAINS = [
     "www.walmart.com",
     "www.flipkart.com",
     "www.amazon.in",
-    "www.amazon.com"
+    "www.amazon.com",
+    "fakestoreapi.com"
 ]
 
 def extract_domain(url):
@@ -20,10 +21,13 @@ def fetch_product_details(product_url):
     domain = parsed.netloc
     trusted = is_trusted_domain(domain)
 
+    # Handle Fake Store API separately
     if "fakestoreapi.com" in domain:
         try:
-            # extract product ID from the URL path like /products/1
-            product_id = parsed.path.strip("/").split("/")[-1]
+            # Extract product ID from URL path: /products/1
+            path_parts = parsed.path.strip("/").split("/")
+            product_id = path_parts[-1] if path_parts else "1"
+
             response = requests.get(f"https://fakestoreapi.com/products/{product_id}")
             response.raise_for_status()
             data = response.json()
@@ -31,7 +35,7 @@ def fetch_product_details(product_url):
             return {
                 "name": data.get("title", "Unknown"),
                 "price": data.get("price", "N/A"),
-                "mrp": round(data.get("price", 0) * 1.8, 2),  # fake inflated MRP
+                "mrp": round(data.get("price", 0) * 1.8, 2),  # Simulated MRP
                 "rating": data.get("rating", {}).get("rate", 0),
                 "product_id": product_id,
                 "domain": domain,
@@ -50,15 +54,16 @@ def fetch_product_details(product_url):
                 "error": str(e)
             }
 
-    # Default simulation for trusted domains like Amazon/Walmart
+    # Default response for other trusted domains (simulated)
     product_id = parse_qs(parsed.query).get('id', ['123456'])[0]
 
     return {
         "name": "Samsung Smart TV 55inch",
         "price": 299.99,
-        "mrp": 999.99,
-        "rating": 2.0,
+        "mrp": 799.99,
+        "rating": 3.9,
         "product_id": product_id,
         "domain": domain,
-        "trusted_domain": trusted
+        "trusted_domain": trusted,
+        "image": "https://via.placeholder.com/150"
     }
