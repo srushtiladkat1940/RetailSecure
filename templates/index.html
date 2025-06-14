@@ -3,19 +3,35 @@
 <head>
   <title>RetailSecure - Fake Deal Detector</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
+    .result { margin-top: 20px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    img.product-image { max-width: 200px; border-radius: 10px; margin-bottom: 10px; }
+    h1 { color: #2c3e50; }
+    .error { color: red; font-weight: bold; }
+  </style>
 </head>
 <body>
   <h1>RetailSecure 🛡️</h1>
+
   <form method="POST">
-    <input type="text" name="product_url" placeholder="Paste product link here" required>
+    <input type="text" name="product_url" placeholder="Paste product link here" style="width: 400px;" required>
     <button type="submit">Scan Product</button>
   </form>
 
-  {% if product %}
+  {% if product.error %}
+    <p class="error">{{ product.error }}</p>
+  {% endif %}
+
+  {% if product.name %}
     <div class="result">
-      <h2>Product: {{ product.name }}</h2>
-      <p>Price: ₹{{ product.price }} / MRP: ₹{{ product.mrp }}</p>
-      <p>Rating: {{ product.rating }}⭐</p>
+      {% if product.image %}
+        <img src="{{ product.image }}" alt="Product Image" class="product-image">
+      {% endif %}
+      <h2>{{ product.name }}</h2>
+      <p><strong>Price:</strong> ₹{{ product.price }} | <strong>MRP:</strong> ₹{{ product.mrp }}</p>
+      <p><strong>Rating:</strong> {{ product.rating }} ⭐</p>
+      <p><strong>Domain:</strong> {{ product.domain }} | Trusted: {{ '✅' if product.trusted_domain else '❌' }}</p>
 
       <h3>🛑 Warnings:</h3>
       <ul>
@@ -25,7 +41,7 @@
       </ul>
 
       <h3>🤖 AI Classification:</h3>
-      <p>{{ ai_result.label }} (Confidence: {{ ai_result.confidence }}%)</p>
+      <p><strong>{{ ai_result.label }}</strong> (Confidence: {{ ai_result.confidence }}%)</p>
     </div>
   {% endif %}
 </body>
