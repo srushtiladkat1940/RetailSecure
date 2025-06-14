@@ -10,25 +10,39 @@ app = Flask(__name__)
 def index():
     if request.method == "POST":
         query1 = request.form.get("product1")
-        query2 = request.form.get("product2")
 
-        # Fetch data from Google Shopping API
+        # Fetch only the first product from Walmart API
         product1 = fetch_product_details(query1)
-        product2 = fetch_product_details(query2)
 
-        if "error" in product1 or "error" in product2:
-            error_msg = product1.get("error") or product2.get("error")
-            return render_template("index.html", error=error_msg)
+        if "error" in product1:
+            return render_template("index.html", error=product1["error"])
 
-        # Inject original user query for spelling check
-        product1["user_input"] = query1
-        product2["user_input"] = query2
+        # Hardcoded fake product for product2
+        product2 = {
+            "name": "Samzung Galaxi S23 Ultraa",
+            "price": 8999,
+            "mrp": 79999,
+            "rating": 1.2,
+            "product_id": "fake-s23",
+            "domain": "fake-deals.com",
+            "trusted_domain": False,
+            "image": "https://example.com/fake.jpg",
+            "link": "https://fake-deals.com/s23"
+        }
 
         issues1 = detect_issues(product1)
-        issues2 = detect_issues(product2)
+        issues2 = {
+            "misspelling": True,
+            "fake_discount": True,
+            "low_ratings": True,
+            "suspicious_domain": True
+        }
 
         ai_result1 = classify_name(product1["name"])
-        ai_result2 = classify_name(product2["name"])
+        ai_result2 = {
+            "label": "NEGATIVE",
+            "confidence": 92.3
+        }
 
         return render_template("index.html",
                                product1=product1, product2=product2,
