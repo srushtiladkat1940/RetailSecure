@@ -1,38 +1,34 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>RetailSecure - Fake Deal Detector</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <h1>RetailSecure 🛡️</h1>
-  <form method="POST">
-    <input type="text" name="product_url" placeholder="Search for product name..." required>
-    <button type="submit">Scan Product</button>
-  </form>
+<h1>RetailSecure 🛡️</h1>
+<form method="POST">
+  <input type="text" name="product1" placeholder="Enter first product name..." required>
+  <input type="text" name="product2" placeholder="Enter second product name..." required>
+  <button type="submit">Compare Products</button>
+</form>
 
-  {% if product %}
-    <div class="result">
-      <h2>Product: {{ product.name }}</h2>
-      {% if product.image %}
-        <img src="{{ product.image }}" alt="Product Image" style="max-height: 200px;"><br>
-      {% endif %}
-      {% if product.link %}
-        <p><a href="{{ product.link }}" target="_blank">🔗 View on Store</a></p>
-      {% endif %}
-      <p>Price: ₹{{ product.price }} / MRP: ₹{{ product.mrp }}</p>
-      <p>Rating: {{ product.rating }}⭐</p>
+{% if product1 and product2 %}
+  <div style="display: flex; gap: 30px; justify-content: center;">
+    {% for product, issues, ai_result, label in [(product1, issues1, ai_result1, 'Product 1'), (product2, issues2, ai_result2, 'Product 2')] %}
+      <div class="result" style="flex: 1;">
+        <h2>{{ label }}: {{ product.name }}</h2>
+        {% if product.image %}
+          <img src="{{ product.image }}" alt="Product Image" style="max-height: 200px;"><br>
+        {% endif %}
+        {% if product.link %}
+          <p><a href="{{ product.link }}" target="_blank">🔗 View on Store</a></p>
+        {% endif %}
+        <p>Price: ₹{{ product.price }} / MRP: ₹{{ product.mrp }}</p>
+        <p>Rating: {{ product.rating }}⭐</p>
 
-      <h3>🛑 Warnings:</h3>
-      <ul>
-        {% for key, value in issues.items() %}
-          <li>{{ key.replace('_', ' ').title() }}: {{ '❌' if value else '✅' }}</li>
-        {% endfor %}
-      </ul>
+        <h3>🛑 Warnings:</h3>
+        <ul>
+          {% for key, value in issues.items() %}
+            <li>{{ key.replace('_', ' ').title() }}: {{ '❌' if value else '✅' }}</li>
+          {% endfor %}
+        </ul>
 
-      <h3>🤖 AI Classification:</h3>
-      <p>{{ ai_result.label }} (Confidence: {{ ai_result.confidence }}%)</p>
-    </div>
-  {% endif %}
-</body>
-</html>
+        <h3>🤖 AI Classification:</h3>
+        <p>{{ ai_result.label }} (Confidence: {{ ai_result.confidence }}%)</p>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
