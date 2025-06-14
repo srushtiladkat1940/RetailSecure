@@ -1,4 +1,2 @@
 Flask
-transformers
-torch
 requests
