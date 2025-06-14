@@ -50,7 +50,7 @@
           <h3>🛑 Warnings:</h3>
           <ul>
             {% for key, value in issues.items() %}
-              <li>{{ key.replace('_', ' ').title() }}: {{ '❌' if value else '✅' }}</li>
+              <li>{{ key.replace('_', ' ').title() }}: {{ '✅' if value else '❌' }}</li>
             {% endfor %}
           </ul>
 
