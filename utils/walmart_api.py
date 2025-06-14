@@ -1,6 +1,6 @@
 import requests
 
-SERP_API_KEY = "YOUR_SERPAPI_KEY"  # Replace with your actual key
+SERP_API_KEY = "f6e96ff0531de455248fd3a76534ce7e96f26f5ffbadb5f4bc2d88381788f3ce"  # Replace with your actual key
 
 def fetch_product_details(product_query):
     url = "https://serpapi.com/search.json"
